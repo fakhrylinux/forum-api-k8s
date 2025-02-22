@@ -19,6 +19,7 @@ kubectl apply -f forum-api -f postgres
 kubectl get all -n forum-api
 ```
 Example:
+
 ![kubectl comand](https://i.imgur.com/3D5mnLZ.png)
 - Get the cluster ip address
 ```sh
