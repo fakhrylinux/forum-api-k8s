@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: forum-api-server
+  namespace: forum-api
+spec:
+  selector:
+    app: forum-api
+  ports:
+  - port: 5000
+  type: NodePort
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forum-api
+  namespace: forum-api
+spec:
+  selector:
+    matchLabels:
+      app: forum-api
+  template:
+    metadata:
+      labels:
+        app: forum-api
+    spec:
+      containers:
+        - name: forum-api
+          image: ghcr.io/fakhrylinux/forum-api-hapi-js:1.0.0
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+          - containerPort: 5000
+          env:
+            - name: HOST
+              value: 0.0.0.0
+            - name: PORT
+              value: "5000"
+            - name: ACCESS_TOKEN_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: forum-api-secret
+                  key: access-token-key
+            - name: REFRESH_TOKEN_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: forum-api-secret
+                  key: refresh-token-key
+            - name: ACCESS_TOKEN_AGE
+              value: "3000"
+            - name: PGHOST
+              value: postgres-svc
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: PGDB
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: PGUSER            
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: PGPASSWORD
+            - name: PGPORT
+              value: "5432"
+            
+
